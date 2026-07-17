@@ -15,3 +15,7 @@ node tools/lazycodex-model-policy/scripts/install.mjs
 
 The tool is a policy layer, not a replacement for [LazyCodex](https://github.com/code-yeongyu/lazycodex).
 LazyCodex must already be installed in Codex.
+
+## License
+
+WolfMark Lab is released under the [MIT License](./LICENSE).
