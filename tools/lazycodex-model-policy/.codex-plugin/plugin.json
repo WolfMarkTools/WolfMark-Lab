@@ -1,0 +1,29 @@
+{
+  "name": "lazycodex-model-policy",
+  "version": "0.1.0",
+  "description": "Keeps LazyCodex subagents within an editable model and reasoning policy.",
+  "author": {
+    "name": "WolfMark Tools",
+    "url": "https://github.com/WolfMarkTools"
+  },
+  "homepage": "https://github.com/WolfMarkTools/WolfMark-Lab/tree/main/tools/lazycodex-model-policy",
+  "repository": "https://github.com/WolfMarkTools/WolfMark-Lab",
+  "license": "MIT",
+  "keywords": ["codex", "lazycodex", "agents", "models", "reasoning"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "LazyCodex Model Policy",
+    "shortDescription": "Control the model and reasoning level used by LazyCodex subagents.",
+    "longDescription": "A small policy layer for LazyCodex. It reconciles agent TOML files immediately before each subagent spawn, so editable model defaults survive LazyCodex updates.",
+    "developerName": "WolfMark Tools",
+    "category": "Productivity",
+    "capabilities": ["Write"],
+    "websiteURL": "https://github.com/WolfMarkTools/WolfMark-Lab",
+    "defaultPrompt": [
+      "Install the LazyCodex model policy",
+      "Show my LazyCodex model policy",
+      "Customise my LazyCodex reasoning levels"
+    ],
+    "brandColor": "#E9A23B"
+  }
+}

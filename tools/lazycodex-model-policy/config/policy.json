@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "agents": {
+    "lazycodex-executor": {
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "high"
+    },
+    "lazycodex-worker-low": {
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "medium"
+    },
+    "lazycodex-worker-medium": {
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "high"
+    },
+    "lazycodex-worker-high": {
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high"
+    },
+    "lazycodex-code-reviewer": {
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "xhigh"
+    },
+    "lazycodex-gate-reviewer": {
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "xhigh"
+    },
+    "lazycodex-clone-fidelity-reviewer": {
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "xhigh"
+    },
+    "lazycodex-qa-executor": {
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "high"
+    },
+    "explorer": {
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "low"
+    },
+    "librarian": {
+      "model": "gpt-5.6-luna",
+      "reasoning_effort": "low"
+    },
+    "metis": {
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "high"
+    },
+    "momus": {
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "ultra"
+    },
+    "plan": {
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "max"
+    }
+  },
+  "fallbacks": [
+    {
+      "when": {
+        "model": "gpt-5.6-sol",
+        "reasoning_effort": "max"
+      },
+      "replace_with": {
+        "model": "gpt-5.6-terra",
+        "reasoning_effort": "max"
+      }
+    }
+  ]
+}
