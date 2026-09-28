@@ -1,8 +1,12 @@
-# WolfMark Lab
+# WolfMark Labs
 
 Small, practical tools for making AI-assisted work more controllable.
 
 ## Tools
+
+### WolfMarkDown
+
+WolfMarkDown has moved to its dedicated repository: [WolfMarkTools/WolfMarkDown](https://github.com/WolfMarkTools/WolfMarkDown).
 
 ### [LazyCodex Model Policy](./tools/lazycodex-model-policy/)
 
