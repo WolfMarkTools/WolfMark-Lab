@@ -16,6 +16,12 @@ provides the harness, roles, workflows, hooks, and subagent spawning behavior.
 
 ## Install
 
+Clone the repository if you do not already have a checkout:
+
+```bash
+git clone https://github.com/WolfMarkTools/WolfMark-Lab.git
+```
+
 From the repository checkout, run:
 
 ```bash
