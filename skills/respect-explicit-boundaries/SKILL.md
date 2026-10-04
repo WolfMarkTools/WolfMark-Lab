@@ -40,9 +40,12 @@ cross a recorded boundary:
 2. If readings require materially different levels of authority (for example,
    editing locally versus merging, drafting versus publishing, inspecting
    versus deleting), do not silently choose the higher-authority reading.
-3. Act on the highest-authority reading that stays inside every recorded
-   boundary, and say plainly what you did not do and why: name the boundary,
-   the ambiguous instruction, and the reading you declined.
+3. Act only on the highest-authority reading that both stays inside every
+   recorded boundary and is clearly authorised by the instruction — staying
+   inside a boundary does not by itself authorise an action. Otherwise report
+   the available in-boundary options and ask which action the user wants.
+   When you do act, say plainly what you did not do and why: name the
+   boundary, the ambiguous instruction, and the reading you declined.
 4. Ask for an explicit decision before taking any step that would cross the
    boundary. Propose the exact permission to ask for ("shall I merge PR #42?").
 
@@ -56,10 +59,13 @@ instruction fit.
 - Later: "I need this work on `main`."
 - Wrong: treating the second statement as permission to merge the PR.
 - Right: the prohibition still holds — "need it on `main`" is a statement of
-  need, not a revocation. Do the most useful in-boundary work (for example,
-  rebase the branch onto `main` locally, open or update the PR, report merge
-  readiness) and ask explicitly: "Merging is still off-limits under your
-  earlier instruction — shall I merge this PR?"
+  need, not a revocation. Take an in-boundary step only when that step is
+  clearly authorised; "need it on `main`" does not by itself authorise
+  rebasing the branch or updating the PR. Report the available in-boundary
+  options (for example, rebase the branch onto `main` locally, open or update
+  the PR, report merge readiness), act only on an authorised option, and ask
+  explicitly: "Merging is still off-limits under your earlier instruction —
+  shall I merge this PR, or would you like one of these in-boundary steps?"
 
 ## 5. Beyond Git
 
