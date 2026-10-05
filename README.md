@@ -49,6 +49,20 @@ Works with any coding agent.
 npx skills add WolfMarkTools/WolfMark-Lab -s evidence-before-completion -y --full-depth
 ```
 
+### [Respect Explicit Boundaries](./skills/respect-explicit-boundaries/SKILL.md)
+
+Keep explicit user boundaries in force until they are explicitly revoked.
+A later ambiguous instruction is never treated as permission to cross an
+earlier prohibition: when plausible readings require materially different
+levels of authority, the skill requires acting inside the boundary and asking
+before any step that would cross it. Covers merging, publishing, deploying,
+deleting, spending, and other external-state or approval-gated actions.
+Works with any coding agent.
+
+```bash
+npx skills add WolfMarkTools/WolfMark-Lab -s respect-explicit-boundaries -y --full-depth
+```
+
 ### [LazyCodex Model Policy](./tools/lazycodex-model-policy/skills/lazycodex-model-policy/SKILL.md)
 
 Install, inspect, customise, repair, or remove the LazyCodex model and
