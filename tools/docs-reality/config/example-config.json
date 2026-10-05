@@ -1,0 +1,10 @@
+{
+  "docs": ["README.md", "docs"],
+  "exclude": ["docs/drafts/**"],
+  "format": "markdown",
+  "failOn": ["broken-file-ref", "broken-command", "stale-flag", "stale-config-key", "stale-package", "stale-workflow", "ghost-doc"],
+  "warningOnly": false,
+  "includeAgentFiles": false,
+  "checkUndocumented": true,
+  "flagAllowlist": ["--help", "--version"]
+}

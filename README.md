@@ -20,6 +20,17 @@ node tools/lazycodex-model-policy/scripts/install.mjs
 The tool is a policy layer, not a replacement for [LazyCodex](https://github.com/code-yeongyu/lazycodex).
 LazyCodex must already be installed in Codex.
 
+### [Docs Reality](./tools/docs-reality/)
+
+Compare documented commands, files, flags, configuration keys, packages and
+workflows against repository reality, and propose minimal, evidence-backed
+corrections. JSON and Markdown reports support CI and human review; an
+[Agent Skill](./skills/docs-reality/SKILL.md) guides the fix-up.
+
+```bash
+node tools/docs-reality/scripts/docs-reality.mjs --format markdown
+```
+
 ## Skills
 
 Agent skills installable with [skills.sh](https://skills.sh).
@@ -61,6 +72,17 @@ Works with any coding agent.
 
 ```bash
 npx skills add WolfMarkTools/WolfMark-Lab -s respect-explicit-boundaries -y --full-depth
+```
+
+### [Docs Reality](./skills/docs-reality/SKILL.md)
+
+Check user and developer documentation against the repository before trusting
+it, and fix drift with minimal, evidence-backed edits scoped to the affected
+line or section. Valid references are never rewritten; agent-instruction files
+stay with Rules Forge. Works with any coding agent.
+
+```bash
+npx skills add WolfMarkTools/WolfMark-Lab -s docs-reality -y --full-depth
 ```
 
 ### [LazyCodex Model Policy](./tools/lazycodex-model-policy/skills/lazycodex-model-policy/SKILL.md)

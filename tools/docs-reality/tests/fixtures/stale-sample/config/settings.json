@@ -1,0 +1,6 @@
+{
+  "keep_key": true,
+  "nested": {
+    "inner_key": 1
+  }
+}

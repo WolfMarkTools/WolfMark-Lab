@@ -1,0 +1,12 @@
+{
+  "name": "stale-sample",
+  "version": "0.1.0",
+  "scripts": {
+    "test": "node --test",
+    "start": "node scripts/cli.mjs",
+    "fresh-feature": "node scripts/fresh.mjs"
+  },
+  "dependencies": {
+    "left-pad": "^1.0.0"
+  }
+}
