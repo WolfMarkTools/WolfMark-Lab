@@ -43,10 +43,12 @@ Exit codes: 0 ok (or warning-only), 2 drift found in --check mode, 1 usage/IO er
 function parseArgs(argv) {
   const opts = {
     root: process.cwd(),
+    rootSpecified: false,
     docs: null,
     exclude: [],
     config: null,
     format: "markdown",
+    formatSpecified: false,
     out: null,
     check: false,
     failOn: null,
@@ -88,11 +90,17 @@ function parseArgs(argv) {
         throw new Error(`missing value for ${arg}`);
       }
       i++;
-      if (arg === "--root") opts.root = value;
+      if (arg === "--root") {
+        opts.root = value;
+        opts.rootSpecified = true;
+      }
       else if (arg === "--docs") opts.docs = value.split(",").map((s) => s.trim()).filter(Boolean);
       else if (arg === "--exclude") opts.exclude = value.split(",").map((s) => s.trim()).filter(Boolean);
       else if (arg === "--config") opts.config = value;
-      else if (arg === "--format") opts.format = value;
+      else if (arg === "--format") {
+        opts.format = value;
+        opts.formatSpecified = true;
+      }
       else if (arg === "--out") opts.out = value;
       else if (arg === "--fail-on") opts.failOn = value.split(",").map((s) => s.trim()).filter(Boolean);
       continue;
@@ -107,10 +115,10 @@ async function loadConfig(opts) {
   const raw = await readFile(resolve(opts.config), "utf8");
   const file = JSON.parse(raw);
   const merged = { ...opts };
-  if (file.root !== undefined && opts.root === process.cwd()) merged.root = file.root;
+  if (file.root !== undefined && !opts.rootSpecified) merged.root = file.root;
   if (file.docs !== undefined && opts.docs === null) merged.docs = file.docs;
   if (file.exclude !== undefined && opts.exclude.length === 0) merged.exclude = file.exclude;
-  if (file.format !== undefined && opts.format === "markdown") merged.format = file.format;
+  if (file.format !== undefined && !opts.formatSpecified) merged.format = file.format;
   if (file.failOn !== undefined && opts.failOn === null) merged.failOn = file.failOn;
   if (file.warningOnly !== undefined && opts.warningOnly === false) merged.warningOnly = file.warningOnly;
   if (file.includeAgentFiles !== undefined && opts.includeAgentFiles === false) {

@@ -337,7 +337,7 @@ export async function collectRepoFacts(rootAbs, { exclude = [], includeAgentFile
   };
 }
 
-function resolveRefCandidates(ref, docRel) {
+function resolveRefCandidates(ref, docRel, { rootFallback = true } = {}) {
   const cleaned = ref.trim().split("#")[0].split("?")[0].trim();
   if (!cleaned) return [];
   if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(cleaned)) return [];
@@ -349,7 +349,7 @@ function resolveRefCandidates(ref, docRel) {
   const prefix = docDir === "." ? "" : `${docDir}/`;
   const candidates = [];
   if (prefix) candidates.push(normalizePosix(prefix + cleaned));
-  candidates.push(normalizePosix(cleaned));
+  if (rootFallback || !prefix) candidates.push(normalizePosix(cleaned));
   return [...new Set(candidates)].filter((c) => c !== "" && !c.startsWith(".."));
 }
 
@@ -394,9 +394,13 @@ function parseNodeInvocations(line) {
     const tokens = rest.split(/\s+/).map(cleanToken).filter(Boolean);
     let fileToken = null;
     const appFlags = [];
+    const nodeFlags = [];
     let sawFile = false;
     for (const token of tokens) {
-      if (!sawFile && token.startsWith("-")) continue;
+      if (!sawFile && token.startsWith("-")) {
+        if (/^--[A-Za-z][A-Za-z0-9-]*$/.test(token)) nodeFlags.push(token);
+        continue;
+      }
       if (!sawFile) {
         sawFile = true;
         fileToken = token;
@@ -404,7 +408,7 @@ function parseNodeInvocations(line) {
       }
       if (/^--[A-Za-z][A-Za-z0-9-]*$/.test(token)) appFlags.push(token);
     }
-    invocations.push({ fileToken, appFlags });
+    invocations.push({ fileToken, appFlags, nodeFlags });
   }
   return invocations;
 }
@@ -440,7 +444,9 @@ function packageRoot(spec) {
   const cleaned = noVersion || spec;
   if (cleaned.startsWith("@")) {
     const parts = cleaned.split("/");
-    return parts.length >= 2 ? `${parts[0]}/${parts[1]}` : cleaned;
+    if (parts.length < 2) return cleaned;
+    const name = parts[1].split("@")[0];
+    return name ? `${parts[0]}/${name}` : cleaned;
   }
   return cleaned.split("/")[0];
 }
@@ -468,7 +474,7 @@ export async function checkDocs(rootInput, options = {}) {
   let referencesChecked = 0;
 
   const sectionOf = (doc, heading, headingLine) => {
-    const key = `${doc}${heading}`;
+    const key = `${doc}\u0000${headingLine}\u0000${heading}`;
     let entry = sectionStats.get(key);
     if (!entry) {
       entry = { doc, heading, headingLine, total: 0, broken: 0, refs: [], firstBrokenLine: null };
@@ -536,7 +542,7 @@ export async function checkDocs(rootInput, options = {}) {
         const target = match[2].split("#")[0].split("?")[0].trim();
         if (!target || /^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(target) || seenLinkTargets.has(target)) continue;
         seenLinkTargets.add(target);
-        const candidates = resolveRefCandidates(target, doc);
+        const candidates = resolveRefCandidates(target, doc, { rootFallback: false });
         const hit = candidates.find((c) => existsInRepo(c, facts));
         if (hit) {
           section.total += 1;
@@ -745,28 +751,35 @@ export async function checkDocs(rootInput, options = {}) {
       // D3. Flags documented alongside a resolvable `node <file>` (or an
       // `npm run <script>` whose body runs such a file) must appear in it.
       const authorityFiles = [...new Set([...nodeFilesOnLine, ...npmFilesOnLine])];
-      if (authorityFiles.length > 0) {
+      const loadedAuthority = authorityFiles.filter((rel) => facts.sourceTexts.has(rel));
+      if (authorityFiles.length > 0 && loadedAuthority.length > 0) {
+        const nodeInvocations = parseNodeInvocations(line);
+        const appFlagSet = new Set(nodeInvocations.flatMap((inv) => inv.appFlags));
+        const runtimeFlagSet = new Set(nodeInvocations.flatMap((inv) => inv.nodeFlags ?? []));
         const flagMatches = [...line.replace(/https?:\/\/\S+/g, "").matchAll(/--[A-Za-z][A-Za-z0-9-]*/g)]
-          .map((m) => m[0]);
-        for (const invocation of parseNodeInvocations(line)) {
+          .map((m) => m[0])
+          .filter((flag) => !runtimeFlagSet.has(flag) || appFlagSet.has(flag));
+        for (const invocation of nodeInvocations) {
           for (const flag of invocation.appFlags) {
             if (!flagMatches.includes(flag)) flagMatches.push(flag);
           }
         }
         for (const flag of [...new Set(flagMatches)]) {
           if (allowlist.has(flag)) continue;
-          // Only flags positioned as app arguments count; node runtime flags
-          // before the file token were already excluded by the parser.
           const key = `${flag}`;
           if (seenFlags.has(key)) {
             continue;
           }
-          seenFlags.add(key);
-          const foundIn = authorityFiles.filter((rel) => (facts.sourceTexts.get(rel) ?? "").includes(flag));
+          const foundIn = loadedAuthority.filter((rel) => (facts.sourceTexts.get(rel) ?? "").includes(flag));
           if (foundIn.length > 0) {
+            seenFlags.add(key);
             markValid();
             continue;
           }
+          if (loadedAuthority.length < authorityFiles.length) {
+            continue;
+          }
+          seenFlags.add(key);
           addFinding({
             name: "stale-flag",
             doc,
@@ -776,15 +789,15 @@ export async function checkDocs(rootInput, options = {}) {
             excerpt,
             evidence: {
               method: "flag-in-file",
-              detail: `"${flag}" from this line was not found in ${authorityFiles.map((f) => `"${f}"`).join(", ")} (the documented command target${authorityFiles.length > 1 ? "s" : ""})`,
+              detail: `"${flag}" from this line was not found in ${loadedAuthority.map((f) => `"${f}"`).join(", ")} (the documented command target${loadedAuthority.length > 1 ? "s" : ""})`,
             },
             suggestion: {
               action: "edit-line",
               file: doc,
               startLine: lineNo,
               endLine: lineNo,
-              guidance: `Remove "${flag}" from this line, or restore the flag in ${authorityFiles.join(", ")}.`,
-              replacementPreview: `Remove "${flag}" from line ${lineNo} or restore it in ${authorityFiles.join(", ")}.`,
+              guidance: `Remove "${flag}" from this line, or restore the flag in ${loadedAuthority.join(", ")}.`,
+              replacementPreview: `Remove "${flag}" from line ${lineNo} or restore it in ${loadedAuthority.join(", ")}.`,
             },
           });
         }
